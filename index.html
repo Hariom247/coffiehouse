@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Coffi House — A premium coffee shop experience in Berndorf. Order online, explore our curated menu, and visit us today." />
+    <meta name="theme-color" content="#1a0a00" />
+    <title>Coffi House | Premium Coffee Experience</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+    <!-- Swiper CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+
+    <!-- ═══════════════════════════════════════
+         ORDER MODAL (hidden by default)
+    ═══════════════════════════════════════ -->
+    <div class="modal-backdrop" id="order-modal-backdrop" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="order-modal-title">
+      <div class="modal-card" role="document">
+        <!-- Modal header -->
+        <div class="modal-header">
+          <div>
+            <p class="modal-eyebrow">
+              <i class="fab fa-whatsapp" aria-hidden="true"></i>
+              Order via WhatsApp
+            </p>
+            <h2 class="modal-title" id="order-modal-title">Place Your Order</h2>
+          </div>
+          <button class="modal-close-btn" id="order-modal-close" aria-label="Close order form">
+            <i class="fas fa-times" aria-hidden="true"></i>
+          </button>
+        </div>
+
+        <!-- Order form -->
+        <form id="order-form" class="modal-form" novalidate>
+          <!-- Item & Qty Row -->
+          <div class="modal-row">
+            <div class="form-group">
+              <label for="order-item" class="form-label">Menu Item <span class="required-star">*</span></label>
+              <select id="order-item" name="item" class="form-input" required>
+                <option value="" disabled selected>Choose an item…</option>
+                <optgroup label="☕ Hot Beverages">
+                  <option value="Espresso">Espresso</option>
+                  <option value="Cappuccino">Cappuccino</option>
+                  <option value="Latte">Latte</option>
+                  <option value="Flat White">Flat White</option>
+                  <option value="Americano">Americano</option>
+                  <option value="Mocha">Mocha</option>
+                </optgroup>
+                <optgroup label="🧊 Cold Beverages">
+                  <option value="Iced Latte">Iced Latte</option>
+                  <option value="Cold Brew">Cold Brew</option>
+                  <option value="Frappuccino">Frappuccino</option>
+                </optgroup>
+                <optgroup label="🍹 Refreshments">
+                  <option value="Fresh Lemonade">Fresh Lemonade</option>
+                  <option value="Mango Smoothie">Mango Smoothie</option>
+                  <option value="Berry Blast">Berry Blast</option>
+                </optgroup>
+                <optgroup label="🍔 Combos & Bites">
+                  <option value="Special Combo (Coffee + Sandwich)">Special Combo (Coffee + Sandwich)</option>
+                  <option value="Burger & Fries">Burger &amp; Fries</option>
+                </optgroup>
+                <optgroup label="🍰 Desserts">
+                  <option value="Chocolate Cake Slice">Chocolate Cake Slice</option>
+                  <option value="Cheesecake">Cheesecake</option>
+                </optgroup>
+              </select>
+            </div>
+            <div class="form-group form-group--qty">
+              <label for="order-qty" class="form-label">Qty <span class="required-star">*</span></label>
+              <div class="qty-stepper">
+                <button type="button" class="qty-btn" id="qty-minus" aria-label="Decrease quantity">
+                  <i class="fas fa-minus" aria-hidden="true"></i>
+                </button>
+                <input type="number" id="order-qty" name="quantity" class="form-input qty-input" value="1" min="1" max="20" required readonly />
+                <button type="button" class="qty-btn" id="qty-plus" aria-label="Increase quantity">
+                  <i class="fas fa-plus" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Customer name -->
+          <div class="form-group">
+            <label for="order-name" class="form-label">Your Name <span class="required-star">*</span></label>
+            <input type="text" id="order-name" name="name" class="form-input" placeholder="e.g. Hari Sharma" autocomplete="name" required />
+          </div>
+
+          <!-- Phone number -->
+          <div class="form-group">
+            <label for="order-phone" class="form-label">Phone Number <span class="required-star">*</span></label>
+            <input type="tel" id="order-phone" name="phone" class="form-input" placeholder="e.g. +91 98765 43210" autocomplete="tel" required />
+          </div>
+
+          <!-- Delivery type toggle -->
+          <div class="form-group">
+            <label class="form-label">Order Type <span class="required-star">*</span></label>
+            <div class="toggle-group" role="group" aria-label="Order type">
+              <input type="radio" name="order-type" id="type-dine" value="Dine In" class="toggle-radio" checked />
+              <label for="type-dine" class="toggle-label">
+                <i class="fas fa-chair" aria-hidden="true"></i> Dine In
+              </label>
+              <input type="radio" name="order-type" id="type-takeaway" value="Takeaway" class="toggle-radio" />
+              <label for="type-takeaway" class="toggle-label">
+                <i class="fas fa-shopping-bag" aria-hidden="true"></i> Takeaway
+              </label>
+              <input type="radio" name="order-type" id="type-delivery" value="Delivery" class="toggle-radio" />
+              <label for="type-delivery" class="toggle-label">
+                <i class="fas fa-motorcycle" aria-hidden="true"></i> Delivery
+              </label>
+            </div>
+          </div>
+
+          <!-- Delivery address (shown only for Delivery) -->
+          <div class="form-group" id="delivery-address-group" hidden>
+            <label for="order-address" class="form-label">Delivery Address <span class="required-star">*</span></label>
+            <textarea id="order-address" name="address" class="form-input" placeholder="Full delivery address…" rows="2"></textarea>
+          </div>
+
+          <!-- Notes -->
+          <div class="form-group">
+            <label for="order-notes" class="form-label">Special Instructions <span class="optional-tag">(optional)</span></label>
+            <textarea id="order-notes" name="notes" class="form-input" placeholder="e.g. extra sugar, no ice, oat milk…" rows="2"></textarea>
+          </div>
+
+          <!-- CTA -->
+          <button type="submit" class="button whatsapp-btn" id="order-submit-btn">
+            <i class="fab fa-whatsapp" aria-hidden="true"></i>
+            Send Order on WhatsApp
+          </button>
+          <p class="modal-note">
+            <i class="fas fa-info-circle" aria-hidden="true"></i>
+            Your order details will be sent directly to our WhatsApp. We'll confirm within minutes!
+          </p>
+        </form>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         REVIEW MODAL (hidden by default)
+    ═══════════════════════════════════════ -->
+    <div class="modal-backdrop" id="review-modal-backdrop" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="review-modal-title">
+      <div class="modal-card" role="document">
+        <div class="modal-header">
+          <div>
+            <p class="modal-eyebrow">
+              <i class="fas fa-star" aria-hidden="true"></i>
+              Share Your Experience
+            </p>
+            <h2 class="modal-title" id="review-modal-title">Leave a Review</h2>
+          </div>
+          <button class="modal-close-btn" id="review-modal-close" aria-label="Close review form">
+            <i class="fas fa-times" aria-hidden="true"></i>
+          </button>
+        </div>
+        <form id="review-form" class="modal-form" novalidate>
+          <div class="form-group">
+            <label for="review-name" class="form-label">Your Name <span class="required-star">*</span></label>
+            <input type="text" id="review-name" name="name" class="form-input" placeholder="e.g. Priya Verma" autocomplete="name" required />
+          </div>
+
+          <!-- Interactive star rating -->
+          <div class="form-group">
+            <label class="form-label">Rating <span class="required-star">*</span></label>
+            <div class="star-rating" id="star-rating" role="radiogroup" aria-label="Star rating">
+              <input type="radio" name="rating" id="star-5" value="5" class="star-radio" /><label for="star-5" class="star-label" aria-label="5 stars"><i class="fas fa-star"></i></label>
+              <input type="radio" name="rating" id="star-4" value="4" class="star-radio" /><label for="star-4" class="star-label" aria-label="4 stars"><i class="fas fa-star"></i></label>
+              <input type="radio" name="rating" id="star-3" value="3" class="star-radio" /><label for="star-3" class="star-label" aria-label="3 stars"><i class="fas fa-star"></i></label>
+              <input type="radio" name="rating" id="star-2" value="2" class="star-radio" /><label for="star-2" class="star-label" aria-label="2 stars"><i class="fas fa-star"></i></label>
+              <input type="radio" name="rating" id="star-1" value="1" class="star-radio" /><label for="star-1" class="star-label" aria-label="1 star"><i class="fas fa-star"></i></label>
+            </div>
+            <p class="rating-hint" id="rating-hint" aria-live="polite">Tap a star to rate</p>
+          </div>
+
+          <div class="form-group">
+            <label for="review-text" class="form-label">Your Review <span class="required-star">*</span></label>
+            <textarea id="review-text" name="review" class="form-input" placeholder="Tell us about your experience…" rows="4" required></textarea>
+          </div>
+
+          <button type="submit" class="button submit-button" id="review-submit-btn">
+            <i class="fas fa-paper-plane" aria-hidden="true"></i>
+            Submit Review
+          </button>
+          <p class="form-success" id="review-success" aria-live="polite" hidden>
+            <i class="fas fa-check-circle" aria-hidden="true"></i>
+            Thank you! Your review has been received.
+          </p>
+        </form>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         HEADER / NAVBAR
+    ═══════════════════════════════════════ -->
+    <header id="site-header">
+      <nav class="navbar" aria-label="Main navigation">
+        <a href="#" class="nav-logo" aria-label="Coffi House Home">
+          <span class="logo-icon">☕</span>
+          <span class="logo-text">Coffi<span class="logo-accent">House</span></span>
+        </a>
+
+        <!-- Mobile overlay -->
+        <div class="nav-overlay" id="nav-overlay" aria-hidden="true"></div>
+
+        <ul class="nav-menu" id="nav-menu" role="list">
+          <li class="nav-close-item">
+            <button id="menu-close-button" aria-label="Close menu">
+              <i class="fas fa-times"></i>
+            </button>
+          </li>
+          <li class="nav-item"><a href="#" class="nav-link" data-section="home">Home</a></li>
+          <li class="nav-item"><a href="#about" class="nav-link" data-section="about">About</a></li>
+          <li class="nav-item"><a href="#menu" class="nav-link" data-section="menu">Menu</a></li>
+          <li class="nav-item"><a href="#testimonials" class="nav-link" data-section="testimonials">Testimonials</a></li>
+          <li class="nav-item"><a href="#gallery" class="nav-link" data-section="gallery">Gallery</a></li>
+          <li class="nav-item"><a href="#contact" class="nav-link" data-section="contact">Contact</a></li>
+          <!-- Order CTA in menu on mobile -->
+          <li class="nav-item nav-cta-item">
+            <button class="nav-order-cta" id="nav-order-btn-mobile">
+              <i class="fas fa-mug-hot" aria-hidden="true"></i> Order Now
+            </button>
+          </li>
+        </ul>
+
+        <!-- Desktop Order CTA in navbar -->
+        <button class="nav-order-cta nav-order-desktop" id="nav-order-btn-desktop" aria-label="Open order form">
+          <i class="fas fa-mug-hot" aria-hidden="true"></i>
+          <span>Order Now</span>
+        </button>
+
+        <button id="menu-open-button" aria-label="Open menu" aria-expanded="false" aria-controls="nav-menu">
+          <i class="fas fa-bars"></i>
+        </button>
+      </nav>
+    </header>
+
+    <main>
+
+      <!-- ═══════════════════════════════════════
+           HERO SECTION
+      ═══════════════════════════════════════ -->
+      <section class="hero-section" aria-labelledby="hero-heading">
+        <div class="hero-particles" aria-hidden="true">
+          <span></span><span></span><span></span><span></span><span></span>
+        </div>
+
+        <div class="section-content">
+          <div class="hero-details reveal-left">
+            <p class="hero-eyebrow">
+              <span class="eyebrow-line"></span>
+              Est. 2010 · Berndorf, Germany
+            </p>
+            <h1 class="title" id="hero-heading">
+              Best <em>Coffee</em><br />In Town
+            </h1>
+            <h2 class="subtitle">Make your day great with our<br />special handcrafted coffee!</h2>
+            <p class="description">
+              Welcome to our coffee paradise, where every bean tells a story
+              and every cup sparks joy. Sourced from the world's finest estates,
+              brewed with passion.
+            </p>
+            <div class="hero-stats" aria-label="Our numbers">
+              <div class="stat">
+                <strong>500+</strong>
+                <span>Menu Items</span>
+              </div>
+              <div class="stat-divider" aria-hidden="true"></div>
+              <div class="stat">
+                <strong>15K+</strong>
+                <span>Happy Customers</span>
+              </div>
+              <div class="stat-divider" aria-hidden="true"></div>
+              <div class="stat">
+                <strong>14+</strong>
+                <span>Years of Service</span>
+              </div>
+            </div>
+            <div class="buttons">
+              <!-- This now opens the Order Modal -->
+              <button class="button order-now" id="hero-order-btn">
+                <i class="fas fa-mug-hot" aria-hidden="true"></i>
+                Order Now
+              </button>
+              <a href="#contact" class="button contact-us">
+                <i class="fas fa-phone-alt" aria-hidden="true"></i>
+                Contact Us
+              </a>
+            </div>
+          </div>
+
+          <div class="hero-image-wrapper reveal-right" aria-hidden="true">
+            <div class="hero-glow"></div>
+            <div class="hero-ring"></div>
+            <img src="images/coffee-hero-section.png" alt="A premium coffee cup" class="hero-image" width="500" height="500" />
+          </div>
+        </div>
+
+        <a href="#about" class="scroll-indicator" aria-label="Scroll to About section">
+          <span class="scroll-dot"></span>
+        </a>
+      </section>
+
+      <!-- ═══════════════════════════════════════
+           ABOUT SECTION
+      ═══════════════════════════════════════ -->
+      <section class="about-section" id="about" aria-labelledby="about-heading">
+        <div class="section-content">
+          <div class="about-image-wrapper reveal-left">
+            <div class="about-badge">
+              <i class="fas fa-award" aria-hidden="true"></i>
+              <span>Award Winning</span>
+            </div>
+            <img
+              src="images/about-image.jpg"
+              alt="The interior of Coffi House with warm lighting and cozy seating"
+              class="about-image"
+              width="400"
+              height="400"
+              loading="lazy"
+            />
+            <div class="about-years">
+              <strong>14+</strong>
+              <span>Years of<br/>Excellence</span>
+            </div>
+          </div>
+
+          <div class="about-details reveal-right">
+            <p class="section-eyebrow">Our Story</p>
+            <h2 class="section-title" id="about-heading">About Us</h2>
+            <p class="text">
+              At <strong>Coffi House</strong> in Berndorf, Germany, we pride ourselves on being a
+              go-to destination for coffee lovers and conversation seekers alike.
+              We're dedicated to providing an exceptional coffee experience in a
+              cozy and inviting atmosphere, where guests can relax, unwind, and
+              enjoy their time in comfort.
+            </p>
+            <p class="text">
+              Every cup we serve is a testament to our passion for the craft —
+              from ethically sourced beans to our expert baristas who transform
+              them into liquid art.
+            </p>
+            <div class="about-features">
+              <div class="feature-item">
+                <i class="fas fa-leaf" aria-hidden="true"></i>
+                <span>Ethically Sourced</span>
+              </div>
+              <div class="feature-item">
+                <i class="fas fa-fire" aria-hidden="true"></i>
+                <span>Freshly Roasted</span>
+              </div>
+              <div class="feature-item">
+                <i class="fas fa-heart" aria-hidden="true"></i>
+                <span>Made with Love</span>
+              </div>
+            </div>
+            <div class="social-link-list" aria-label="Social media links">
+              <a href="#" class="social-link" aria-label="Facebook">
+                <i class="fa-brands fa-facebook" aria-hidden="true"></i>
+              </a>
+              <a href="#" class="social-link" aria-label="Instagram">
+                <i class="fa-brands fa-instagram" aria-hidden="true"></i>
+              </a>
+              <a href="#" class="social-link" aria-label="X (Twitter)">
+                <i class="fa-brands fa-x-twitter" aria-hidden="true"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════
+           MENU SECTION
+      ═══════════════════════════════════════ -->
+      <section class="menu-section" id="menu" aria-labelledby="menu-heading">
+        <div class="menu-bg-text" aria-hidden="true">MENU</div>
+        <p class="section-eyebrow light">What We Offer</p>
+        <h2 class="section-title" id="menu-heading">Our Menu</h2>
+        <div class="section-content">
+          <ul class="menu-list" role="list">
+            <li class="menu-item reveal-up">
+              <div class="menu-image-wrap">
+                <img src="images/hot-beverages.png" alt="Hot Beverages — steaming coffee" class="menu-image" loading="lazy" />
+                <div class="menu-hover-glow" aria-hidden="true"></div>
+              </div>
+              <div class="menu-details">
+                <h3 class="name">Hot Beverages</h3>
+                <p class="text">Wide range of steaming hot coffee to make you fresh and light.</p>
+                <span class="menu-tag">Bestseller</span>
+              </div>
+              <!-- Quick-order chip per card -->
+              <button class="menu-order-chip open-order-modal" data-item="Hot Beverages" aria-label="Order Hot Beverages">
+                <i class="fas fa-plus" aria-hidden="true"></i> Order
+              </button>
+            </li>
+            <li class="menu-item reveal-up" style="--delay: 0.1s">
+              <div class="menu-image-wrap">
+                <img src="images/cold-beverages.png" alt="Cold Beverages — iced coffee" class="menu-image" loading="lazy" />
+                <div class="menu-hover-glow" aria-hidden="true"></div>
+              </div>
+              <div class="menu-details">
+                <h3 class="name">Cold Beverages</h3>
+                <p class="text">Creamy and frothy cold coffee to keep you cool and refreshed.</p>
+                <span class="menu-tag">Popular</span>
+              </div>
+              <button class="menu-order-chip open-order-modal" data-item="Iced Latte" aria-label="Order Cold Beverages">
+                <i class="fas fa-plus" aria-hidden="true"></i> Order
+              </button>
+            </li>
+            <li class="menu-item reveal-up" style="--delay: 0.2s">
+              <div class="menu-image-wrap">
+                <img src="images/refreshment.png" alt="Refreshments — fruit drinks and smoothies" class="menu-image" loading="lazy" />
+                <div class="menu-hover-glow" aria-hidden="true"></div>
+              </div>
+              <div class="menu-details">
+                <h3 class="name">Refreshments</h3>
+                <p class="text">Fruit and icy refreshing drinks to revitalize your senses.</p>
+                <span class="menu-tag">Seasonal</span>
+              </div>
+              <button class="menu-order-chip open-order-modal" data-item="Fresh Lemonade" aria-label="Order Refreshments">
+                <i class="fas fa-plus" aria-hidden="true"></i> Order
+              </button>
+            </li>
+            <li class="menu-item reveal-up" style="--delay: 0.3s">
+              <div class="menu-image-wrap">
+                <img src="images/special-combo.png" alt="Special Combos — curated meal deals" class="menu-image" loading="lazy" />
+                <div class="menu-hover-glow" aria-hidden="true"></div>
+              </div>
+              <div class="menu-details">
+                <h3 class="name">Special Combos</h3>
+                <p class="text">Your favourite food and drink combinations at great value.</p>
+                <span class="menu-tag">New</span>
+              </div>
+              <button class="menu-order-chip open-order-modal" data-item="Special Combo (Coffee + Sandwich)" aria-label="Order Special Combos">
+                <i class="fas fa-plus" aria-hidden="true"></i> Order
+              </button>
+            </li>
+            <li class="menu-item reveal-up" style="--delay: 0.4s">
+              <div class="menu-image-wrap">
+                <img src="images/desserts.png" alt="Desserts — cakes, pastries and sweets" class="menu-image" loading="lazy" />
+                <div class="menu-hover-glow" aria-hidden="true"></div>
+              </div>
+              <div class="menu-details">
+                <h3 class="name">Desserts</h3>
+                <p class="text">Satisfy your palate and take your taste buds on a culinary treat.</p>
+                <span class="menu-tag">Chef's Pick</span>
+              </div>
+              <button class="menu-order-chip open-order-modal" data-item="Chocolate Cake Slice" aria-label="Order Desserts">
+                <i class="fas fa-plus" aria-hidden="true"></i> Order
+              </button>
+            </li>
+            <li class="menu-item reveal-up" style="--delay: 0.5s">
+              <div class="menu-image-wrap">
+                <img src="images/burger-frenchfries.png" alt="Burgers and French Fries" class="menu-image" loading="lazy" />
+                <div class="menu-hover-glow" aria-hidden="true"></div>
+              </div>
+              <div class="menu-details">
+                <h3 class="name">Burger &amp; Fries</h3>
+                <p class="text">Quick bites to satisfy your hunger in style, any time of day.</p>
+                <span class="menu-tag">Quick Bite</span>
+              </div>
+              <button class="menu-order-chip open-order-modal" data-item="Burger & Fries" aria-label="Order Burger and Fries">
+                <i class="fas fa-plus" aria-hidden="true"></i> Order
+              </button>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════
+           TESTIMONIALS SECTION
+      ═══════════════════════════════════════ -->
+      <section class="testimonials-section" id="testimonials" aria-labelledby="testimonials-heading">
+        <p class="section-eyebrow">What People Say</p>
+        <h2 class="section-title" id="testimonials-heading">Testimonials</h2>
+        <div class="section-content">
+          <div class="slider-container swiper" aria-roledescription="carousel" aria-label="Customer testimonials">
+            <div class="slider-wrapper swiper-wrapper">
+              <article class="testimonial swiper-slide" aria-roledescription="slide">
+                <div class="quote-icon" aria-hidden="true"><i class="fas fa-quote-left"></i></div>
+                <i class="feedback">"Loved the French roast. Perfectly balanced and rich. Will order again!"</i>
+                <div class="testimonial-author">
+                  <img src="images/user-1.jpg" alt="Photo of Sarah Johnson" class="user-image" width="80" height="80" loading="lazy" />
+                  <div>
+                    <h3 class="name">Sarah Johnson</h3>
+                    <div class="stars" aria-label="5 stars">
+                      <i class="fas fa-star" aria-hidden="true"></i><i class="fas fa-star" aria-hidden="true"></i>
+                      <i class="fas fa-star" aria-hidden="true"></i><i class="fas fa-star" aria-hidden="true"></i>
+                      <i class="fas fa-star" aria-hidden="true"></i>
+                    </div>
+                  </div>
+                </div>
+              </article>
+              <article class="testimonial swiper-slide" aria-roledescription="slide">
+                <div class="quote-icon" aria-hidden="true"><i class="fas fa-quote-left"></i></div>
+                <i class="feedback">"Great espresso blend! Smooth and bold flavor. Fast shipping too!"</i>
+                <div class="testimonial-author">
+                  <img src="images/user-2.jpg" alt="Photo of James Wilson" class="user-image" width="80" height="80" loading="lazy" />
+                  <div>
+                    <h3 class="name">James Wilson</h3>
+                    <div class="stars" aria-label="5 stars">
+                      <i class="fas fa-star" aria-hidden="true"></i><i class="fas fa-star" aria-hidden="true"></i>
+                      <i class="fas fa-star" aria-hidden="true"></i><i class="fas fa-star" aria-hidden="true"></i>
+                      <i class="fas fa-star" aria-hidden="true"></i>
+                    </div>
+                  </div>
+                </div>
+              </article>
+              <article class="testimonial swiper-slide" aria-roledescription="slide">
+                <div class="quote-icon" aria-hidden="true"><i class="fas fa-quote-left"></i></div>
+                <i class="feedback">"Fantastic mocha flavor. Fresh and aromatic. Quick delivery every time!"</i>
+                <div class="testimonial-author">
+                  <img src="images/user-3.jpg" alt="Photo of Michael Brown" class="user-image" width="80" height="80" loading="lazy" />
+                  <div>
+                    <h3 class="name">Michael Brown</h3>
+                    <div class="stars" aria-label="5 stars">
+                      <i class="fas fa-star" aria-hidden="true"></i><i class="fas fa-star" aria-hidden="true"></i>
+                      <i class="fas fa-star" aria-hidden="true"></i><i class="fas fa-star" aria-hidden="true"></i>
+                      <i class="fas fa-star" aria-hidden="true"></i>
+                    </div>
+                  </div>
+                </div>
+              </article>
+              <article class="testimonial swiper-slide" aria-roledescription="slide">
+                <div class="quote-icon" aria-hidden="true"><i class="fas fa-quote-left"></i></div>
+                <i class="feedback">"Excellent quality! Fresh beans and quick delivery. Highly recommend."</i>
+                <div class="testimonial-author">
+                  <img src="images/user-4.jpg" alt="Photo of Emily Harris" class="user-image" width="80" height="80" loading="lazy" />
+                  <div>
+                    <h3 class="name">Emily Harris</h3>
+                    <div class="stars" aria-label="5 stars">
+                      <i class="fas fa-star" aria-hidden="true"></i><i class="fas fa-star" aria-hidden="true"></i>
+                      <i class="fas fa-star" aria-hidden="true"></i><i class="fas fa-star" aria-hidden="true"></i>
+                      <i class="fas fa-star" aria-hidden="true"></i>
+                    </div>
+                  </div>
+                </div>
+              </article>
+              <article class="testimonial swiper-slide" aria-roledescription="slide">
+                <div class="quote-icon" aria-hidden="true"><i class="fas fa-quote-left"></i></div>
+                <i class="feedback">"Best decaf I've ever tried! Smooth and flavorful. Arrived promptly."</i>
+                <div class="testimonial-author">
+                  <img src="images/user-5.jpg" alt="Photo of Anthony Thompson" class="user-image" width="80" height="80" loading="lazy" />
+                  <div>
+                    <h3 class="name">Anthony Thompson</h3>
+                    <div class="stars" aria-label="5 stars">
+                      <i class="fas fa-star" aria-hidden="true"></i><i class="fas fa-star" aria-hidden="true"></i>
+                      <i class="fas fa-star" aria-hidden="true"></i><i class="fas fa-star" aria-hidden="true"></i>
+                      <i class="fas fa-star" aria-hidden="true"></i>
+                    </div>
+                  </div>
+                </div>
+              </article>
+            </div>
+            <div class="swiper-pagination" role="tablist" aria-label="Testimonial slides"></div>
+            <div class="swiper-slide-button swiper-button-prev" aria-label="Previous testimonial"></div>
+            <div class="swiper-slide-button swiper-button-next" aria-label="Next testimonial"></div>
+          </div>
+
+          <!-- Leave a Review CTA -->
+          <div class="review-cta-banner">
+            <div class="review-cta-text">
+              <i class="fas fa-star" aria-hidden="true"></i>
+              <p>Enjoyed your visit? We'd love to hear from you!</p>
+            </div>
+            <button class="button order-now" id="open-review-btn">
+              <i class="fas fa-pen" aria-hidden="true"></i>
+              Write a Review
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════
+           GALLERY SECTION
+      ═══════════════════════════════════════ -->
+      <section class="gallery-section" id="gallery" aria-labelledby="gallery-heading">
+        <p class="section-eyebrow">A Peek Inside</p>
+        <h2 class="section-title" id="gallery-heading">Gallery</h2>
+        <div class="section-content">
+          <ul class="gallery-list" role="list">
+            <li class="gallery-item reveal-up">
+              <div class="gallery-image-wrap">
+                <img src="images/gallery-1.jpg" alt="Cozy corner seating at Coffi House" class="gallery-image" loading="lazy" />
+                <div class="gallery-overlay" aria-hidden="true"><i class="fas fa-expand-alt"></i></div>
+              </div>
+            </li>
+            <li class="gallery-item reveal-up" style="--delay: 0.1s">
+              <div class="gallery-image-wrap">
+                <img src="images/gallery-2.jpg" alt="Barista crafting a latte art" class="gallery-image" loading="lazy" />
+                <div class="gallery-overlay" aria-hidden="true"><i class="fas fa-expand-alt"></i></div>
+              </div>
+            </li>
+            <li class="gallery-item reveal-up" style="--delay: 0.2s">
+              <div class="gallery-image-wrap">
+                <img src="images/gallery-3.jpg" alt="Selection of fresh pastries and desserts" class="gallery-image" loading="lazy" />
+                <div class="gallery-overlay" aria-hidden="true"><i class="fas fa-expand-alt"></i></div>
+              </div>
+            </li>
+            <li class="gallery-item reveal-up" style="--delay: 0.3s">
+              <div class="gallery-image-wrap">
+                <img src="images/gallery-4.jpg" alt="Outdoor seating of Coffi House" class="gallery-image" loading="lazy" />
+                <div class="gallery-overlay" aria-hidden="true"><i class="fas fa-expand-alt"></i></div>
+              </div>
+            </li>
+            <li class="gallery-item reveal-up" style="--delay: 0.4s">
+              <div class="gallery-image-wrap">
+                <img src="images/gallery-5.jpg" alt="A rich espresso shot being poured" class="gallery-image" loading="lazy" />
+                <div class="gallery-overlay" aria-hidden="true"><i class="fas fa-expand-alt"></i></div>
+              </div>
+            </li>
+            <li class="gallery-item reveal-up" style="--delay: 0.5s">
+              <div class="gallery-image-wrap">
+                <img src="images/gallery-6.jpg" alt="Friends enjoying coffee together" class="gallery-image" loading="lazy" />
+                <div class="gallery-overlay" aria-hidden="true"><i class="fas fa-expand-alt"></i></div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════
+           MAP CARD — placed above Contact section
+      ═══════════════════════════════════════ -->
+      <section class="map-section" aria-labelledby="map-heading">
+        <div class="section-content">
+          <div class="map-card reveal-up">
+            <div class="map-card-header">
+              <div class="map-card-info">
+                <p class="section-eyebrow" style="text-align:left; margin-bottom:4px;">Find Us Here</p>
+                <h2 class="map-card-title" id="map-heading">Our Location</h2>
+                <address class="map-card-address">
+                  <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
+                  123 Campsite Avenue, Wilderness, CA 98765
+                </address>
+              </div>
+              <a
+                href="https://www.google.com/maps/search/123+Campsite+Avenue,+Wilderness,+CA"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="map-directions-btn"
+                aria-label="Get directions on Google Maps"
+              >
+                <i class="fas fa-location-arrow" aria-hidden="true"></i>
+                Directions
+              </a>
+            </div>
+            <!-- Responsive Google Maps embed -->
+            <div class="map-embed-wrap">
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3024.2219901290355!2d-74.00369368400567!3d40.71312937933185!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c25a23e28c1191%3A0x49f75d3281df052a!2sFinancial+District%2C+New+York%2C+NY!5e0!3m2!1sen!2sus!4v1616562394748!5m2!1sen!2sus"
+                width="100%"
+                height="100%"
+                style="border:0;"
+                allowfullscreen=""
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+                title="Coffi House location on Google Maps"
+              ></iframe>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════
+           CONTACT SECTION
+      ═══════════════════════════════════════ -->
+      <section class="contact-section" id="contact" aria-labelledby="contact-heading">
+        <p class="section-eyebrow">Get In Touch</p>
+        <h2 class="section-title" id="contact-heading">Contact Us</h2>
+        <div class="section-content">
+
+          <address class="contact-info-panel reveal-left">
+            <h3 class="contact-panel-title">
+              <i class="fas fa-map-marked-alt" aria-hidden="true"></i>
+              Find Us
+            </h3>
+            <ul class="contact-info-list" role="list">
+              <li class="contact-info">
+                <span class="contact-icon" aria-hidden="true">
+                  <i class="fa-solid fa-location-crosshairs"></i>
+                </span>
+                <p>123 Campsite Avenue, Wilderness, CA 98765</p>
+              </li>
+              <li class="contact-info">
+                <span class="contact-icon" aria-hidden="true">
+                  <i class="fa-regular fa-envelope"></i>
+                </span>
+                <p><a href="mailto:info@coffihouse.com">info@coffihouse.com</a></p>
+              </li>
+              <li class="contact-info">
+                <span class="contact-icon" aria-hidden="true">
+                  <i class="fa-solid fa-phone"></i>
+                </span>
+                <p><a href="tel:+11234567890">(123) 456-7890</a></p>
+              </li>
+            </ul>
+            <h3 class="contact-panel-title" style="margin-top: 32px;">
+              <i class="fas fa-clock" aria-hidden="true"></i>
+              Hours
+            </h3>
+            <ul class="contact-info-list hours-list" role="list">
+              <li class="contact-info">
+                <span class="hours-day">Mon – Fri</span>
+                <span class="hours-time">9:00 AM – 5:00 PM</span>
+              </li>
+              <li class="contact-info">
+                <span class="hours-day">Saturday</span>
+                <span class="hours-time">10:00 AM – 3:00 PM</span>
+              </li>
+              <li class="contact-info closed">
+                <span class="hours-day">Sunday</span>
+                <span class="hours-time">Closed</span>
+              </li>
+            </ul>
+            <!-- WhatsApp quick contact -->
+            <a href="https://wa.me/11234567890" target="_blank" rel="noopener noreferrer" class="whatsapp-quick-btn" aria-label="Chat on WhatsApp">
+              <i class="fab fa-whatsapp" aria-hidden="true"></i>
+              Chat on WhatsApp
+            </a>
+          </address>
+
+          <form action="#" class="contact-form reveal-right" id="contact-form" novalidate>
+            <h3 class="form-title">Send a Message</h3>
+            <div class="form-group">
+              <label for="contact-name" class="form-label">Your Name</label>
+              <input type="text" id="contact-name" name="name" placeholder="e.g. Jane Smith" class="form-input" autocomplete="name" required />
+            </div>
+            <div class="form-group">
+              <label for="contact-email" class="form-label">Email Address</label>
+              <input type="email" id="contact-email" name="email" placeholder="e.g. jane@example.com" class="form-input" autocomplete="email" required />
+            </div>
+            <div class="form-group">
+              <label for="contact-message" class="form-label">Message</label>
+              <textarea id="contact-message" name="message" placeholder="Tell us how we can help…" class="form-input" rows="5" required></textarea>
+            </div>
+            <button type="submit" class="button submit-button" id="submit-btn">
+              <i class="fas fa-paper-plane" aria-hidden="true"></i>
+              Send Message
+            </button>
+            <p class="form-success" id="form-success" aria-live="polite" hidden>
+              <i class="fas fa-check-circle" aria-hidden="true"></i>
+              Thanks! We'll be in touch soon.
+            </p>
+          </form>
+
+        </div>
+      </section>
+
+    </main>
+
+    <!-- ═══════════════════════════════════════
+         FOOTER
+    ═══════════════════════════════════════ -->
+    <footer class="footer-section" role="contentinfo">
+      <div class="section-content">
+        <a href="#" class="footer-logo" aria-label="Coffi House Home">
+          <span class="logo-icon">☕</span>
+          <span class="logo-text">Coffi<span class="logo-accent">House</span></span>
+        </a>
+        <p class="copyright-text">© 2024 CoffiHouse. All rights reserved.</p>
+        <nav class="footer-nav" aria-label="Social media">
+          <div class="social-link-list">
+            <a href="#" class="social-link" aria-label="Facebook"><i class="fa-brands fa-facebook" aria-hidden="true"></i></a>
+            <a href="#" class="social-link" aria-label="Instagram"><i class="fa-brands fa-instagram" aria-hidden="true"></i></a>
+            <a href="#" class="social-link" aria-label="X (Twitter)"><i class="fa-brands fa-x-twitter" aria-hidden="true"></i></a>
+          </div>
+        </nav>
+        <p class="policy-text">
+          <a href="#" class="policy-link">Privacy Policy</a>
+          <span class="separator" aria-hidden="true">•</span>
+          <a href="#" class="policy-link">Refund Policy</a>
+        </p>
+      </div>
+    </footer>
+
+    <!-- Back to top button -->
+    <a href="#" class="back-to-top" id="back-to-top" aria-label="Back to top">
+      <i class="fas fa-chevron-up" aria-hidden="true"></i>
+    </a>
+
+    <!-- ── Mobile bottom nav bar ────────────────────────── -->
+    <nav class="bottom-nav" aria-label="Quick navigation">
+      <a href="#" class="bottom-nav-item" data-section="home">
+        <i class="fas fa-home" aria-hidden="true"></i>
+        <span>Home</span>
+      </a>
+      <a href="#menu" class="bottom-nav-item" data-section="menu">
+        <i class="fas fa-utensils" aria-hidden="true"></i>
+        <span>Menu</span>
+      </a>
+      <button class="bottom-nav-item bottom-nav-order" id="bottom-order-btn" aria-label="Order Now">
+        <span class="order-bubble">
+          <i class="fas fa-mug-hot" aria-hidden="true"></i>
+        </span>
+        <span>Order</span>
+      </button>
+      <a href="#gallery" class="bottom-nav-item" data-section="gallery">
+        <i class="fas fa-images" aria-hidden="true"></i>
+        <span>Gallery</span>
+      </a>
+      <a href="#contact" class="bottom-nav-item" data-section="contact">
+        <i class="fas fa-phone" aria-hidden="true"></i>
+        <span>Contact</span>
+      </a>
+    </nav>
+
+    <!-- Swiper JS -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <!-- Custom Script -->
+    <script src="script.js"></script>
+  </body>
+</html>
