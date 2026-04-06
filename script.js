@@ -115,10 +115,6 @@ document.addEventListener("DOMContentLoaded", () => {
           navLinks.forEach((link) =>
             link.classList.toggle("active", link.dataset.section === id)
           );
-          // sync bottom nav too
-          document.querySelectorAll(".bottom-nav-item[data-section]").forEach((item) =>
-            item.classList.toggle("active", item.dataset.section === id)
-          );
         }
       });
     },
@@ -127,18 +123,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   sections.forEach((s) => sectionObserver.observe(s));
 
-  // Home active on initial load / near-top scroll
-  const homeLink     = document.querySelector('[data-section="home"]');
-  const homeBottomItem = document.querySelector('.bottom-nav-item[data-section="home"]');
+  // Home active on initial load
+  const homeLink = document.querySelector('[data-section="home"]');
   if (homeLink) homeLink.classList.add("active");
-  if (homeBottomItem) homeBottomItem.classList.add("active");
 
   window.addEventListener("scroll", () => {
     if (window.scrollY < 200) {
       navLinks.forEach((l) => l.classList.toggle("active", l.dataset.section === "home"));
-      document.querySelectorAll(".bottom-nav-item[data-section]").forEach((item) =>
-        item.classList.toggle("active", item.dataset.section === "home")
-      );
     }
   }, { passive: true });
 
@@ -244,7 +235,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("hero-order-btn"),
     document.getElementById("nav-order-btn-mobile"),
     document.getElementById("nav-order-btn-desktop"),
-    document.getElementById("bottom-order-btn"),
+    // bottom-order-btn removed (bottom nav removed)
   ];
 
   orderTriggers.forEach((btn) => {

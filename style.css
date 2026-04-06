@@ -96,7 +96,7 @@
 /* ── Reset & Base ─────────────────────────────────────── */
 *,
 *::before,
-*::after {
+* *::after {
   padding: 0;
   margin: 0;
   box-sizing: border-box;
@@ -105,6 +105,8 @@
 html {
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
+  /* Prevent horizontal scroll globally */
+  overflow-x: hidden;
 }
 
 body {
@@ -2400,21 +2402,11 @@ textarea.form-input {
 /* ── ≤ 640px: Mobile-specific layout ── */
 @media (max-width: 640px) {
 
-  /* Show bottom nav */
-  .bottom-nav {
-    display: flex;
-    align-items: flex-end;
-  }
+  /* ── Mobile-specific layout ── */
 
-  /* Add bottom padding to main so bottom nav doesn't cover content */
-  main,
-  .footer-section {
-    padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
-  }
-
-  /* Back to top sits above bottom nav */
+  /* Back to top — normal position (no bottom nav) */
   .back-to-top {
-    bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+    bottom: var(--space-md);
     right: var(--space-md);
     width: 44px;
     height: 44px;
@@ -2498,5 +2490,312 @@ textarea.form-input {
   .toggle-label {
     padding: 0.5em 0.75em;
     font-size: var(--fs-xs);
+  }
+}
+
+/* ════════════════════════════════════════════════════════
+   MOBILE-FIRST OVERRIDES  —  max 768px
+   All rules here are strictly scoped to mobile.
+   Desktop layout is UNTOUCHED.
+   ════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+
+  /* ── 1. VIEWPORT & OVERFLOW FIX ────────────────────────────── */
+  /* Guarantee nothing causes horizontal scrollbar */
+  body,
+  main,
+  section,
+  header,
+  footer {
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+
+  /* All images are constrained — nothing overflows or gets cut */
+  img {
+    max-width: 100%;
+    height: auto;
+    box-sizing: border-box;
+    object-fit: cover;
+  }
+
+  /* Remove horizontal-scroll-causing widths on fixed-width wrappers */
+  .hero-image-wrapper,
+  .about-image-wrapper,
+  .about-image,
+  .menu-image-wrap,
+  .gallery-image-wrap,
+  .map-embed-wrap,
+  .map-card,
+  .contact-form,
+  .contact-info-panel,
+  .testimonial,
+  .modal-card,
+  .review-cta-banner {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Prevent section content from overflowing */
+  .section-content {
+    width: 100%;
+    max-width: 100vw;
+    padding-inline: var(--space-md);
+    box-sizing: border-box;
+  }
+
+  /* ── 2. HAMBURGER ICON — top-right (3-line animated) ──────── */
+  /* The existing #menu-open-button is our hamburger.
+     Replace Font Awesome bars with a pure-CSS animated 3-line icon. */
+  #menu-open-button {
+    display: flex !important;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    width: 44px;
+    height: 44px;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-sm);
+    border: none;
+    cursor: pointer;
+    z-index: 1100;
+    /* Smooth icon morph */
+    transition: background var(--duration-fast) var(--ease-smooth);
+  }
+
+  /* Hide the Font Awesome icon — we draw our own lines */
+  #menu-open-button i {
+    display: none;
+  }
+
+  /* Three-line hamburger drawn with ::before, ::after and a box-shadow */
+  #menu-open-button::before,
+  #menu-open-button::after {
+    content: "";
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: var(--clr-white);
+    border-radius: 2px;
+    transition: transform var(--duration-normal) var(--ease-smooth),
+      opacity var(--duration-normal) var(--ease-smooth);
+  }
+
+  /* Middle line via box-shadow on ::before */
+  #menu-open-button::before {
+    box-shadow: 0 6px 0 var(--clr-white);
+    transform-origin: center;
+  }
+
+  /* Active state — rotate into × */
+  body.show-mobile-menu #menu-open-button::before {
+    transform: translateY(6px) rotate(45deg);
+    box-shadow: none;
+  }
+
+  body.show-mobile-menu #menu-open-button::after {
+    transform: translateY(-8px) rotate(-45deg);
+  }
+
+  #menu-open-button:hover {
+    background: var(--clr-amber);
+  }
+
+  /* ── 3. MOBILE FULL-SCREEN OVERLAY MENU ────────────────── */
+  /* Override the existing side-drawer to become a full-screen overlay */
+  .nav-menu {
+    position: fixed !important;
+    inset: 0 !important;
+    /* cover entire screen */
+    width: 100% !important;
+    height: 100dvh !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0 !important;
+    background: rgba(26, 10, 0, 0.97) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    /* Start off-screen to the right (slide-in from right) */
+    transform: translateX(100%) !important;
+    transition: transform var(--duration-normal) var(--ease-smooth) !important;
+    /* Reset the inset-inline-start animation from the side-drawer */
+    inset-inline-start: auto !important;
+    z-index: 1050 !important;
+    padding: var(--space-2xl) var(--space-xl) !important;
+    overflow-y: auto !important;
+  }
+
+  /* Slide in when menu is open */
+  body.show-mobile-menu .nav-menu {
+    transform: translateX(0) !important;
+    inset-inline-start: auto !important;
+  }
+
+  /* Nav items — full width centered rows */
+  .nav-item {
+    width: 100%;
+    max-width: 320px;
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  /* Nav links — large, comfortable tap targets */
+  .nav-link {
+    display: block;
+    padding: 0.9em 1.2em !important;
+    font-size: var(--fs-lg) !important;
+    font-weight: var(--fw-medium);
+    color: rgba(255, 255, 255, 0.85) !important;
+    letter-spacing: 0.02em;
+    text-align: center;
+    border-radius: 0;
+  }
+
+  .nav-link:hover,
+  .nav-link.active {
+    color: var(--clr-amber) !important;
+    background: rgba(232, 147, 58, 0.08);
+  }
+
+  /* Close button is hidden — hamburger icon toggles instead */
+  .nav-close-item {
+    display: none !important;
+  }
+
+  /* "Order Now" CTA inside mobile menu */
+  .nav-cta-item {
+    display: block !important;
+    border-bottom: none !important;
+    margin-top: var(--space-xl);
+  }
+
+  .nav-cta-item .nav-order-cta {
+    width: 100%;
+    max-width: 320px;
+    justify-content: center;
+    padding: 0.8em 1.5em;
+    font-size: var(--fs-md);
+    min-height: 52px;
+  }
+
+  /* Desktop order CTA in navbar header — hide on mobile */
+  .nav-order-desktop {
+    display: none !important;
+  }
+
+  /* Overlay backdrop click still works (existing .nav-overlay) */
+  .nav-overlay {
+    display: block;
+    z-index: 1030;
+  }
+
+  /* ── 4. HERO SECTION ───────────────────────────────────── */
+  .hero-section .section-content {
+    padding-inline: var(--space-md);
+  }
+
+  /* Particles that overflow on mobile */
+  .hero-particles span:nth-child(1) {
+    width: 160px;
+    height: 160px;
+    right: -40px;
+  }
+
+  .hero-particles span:nth-child(2) {
+    width: 100px;
+    height: 100px;
+    left: -20px;
+  }
+
+  /* ── 5. ABOUT IMAGE ─────────────────────────────────────── */
+  .about-image {
+    width: min(260px, 80vw);
+    height: min(260px, 80vw);
+  }
+
+  .about-badge {
+    top: -8px;
+    right: 0;
+  }
+
+  .about-years {
+    bottom: -12px;
+    left: 0;
+  }
+
+  /* ── 6. MENU ITEMS ──────────────────────────────────────── */
+  .menu-image-wrap {
+    width: min(180px, 60vw);
+    height: min(180px, 60vw);
+  }
+
+  /* ── 7. GALLERY ───────────────────────────────────────────── */
+  .gallery-image-wrap {
+    aspect-ratio: 4 / 3;
+    width: 100%;
+  }
+
+  /* ── 8. MAP CARD ───────────────────────────────────────────── */
+  .map-card-header {
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+
+  .map-directions-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .map-embed-wrap {
+    height: 220px;
+  }
+
+  /* ── 9. MODAL ──────────────────────────────────────────────── */
+  .modal-card {
+    max-height: 90dvh;
+    padding: var(--space-lg);
+  }
+
+  .modal-row {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .form-group--qty {
+    flex: 1 0 auto !important;
+  }
+
+  /* ── 10. REVIEW BANNER ─────────────────────────────────────── */
+  .review-cta-banner {
+    flex-direction: column;
+    text-align: center;
+    padding: var(--space-xl) var(--space-md);
+  }
+
+  .review-cta-text {
+    justify-content: center;
+  }
+
+  /* ── 11. BACK TO TOP ────────────────────────────────────────── */
+  /* Remove bottom-nav offset */
+  .back-to-top {
+    bottom: var(--space-xl) !important;
+    right: var(--space-md) !important;
+  }
+
+  /* Remove bottom-nav content padding */
+  main,
+  .footer-section {
+    padding-bottom: 0 !important;
+  }
+
+  /* ── 12. FOOTER STACKING ────────────────────────────────────── */
+  .footer-section .section-content {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--space-md);
   }
 }
